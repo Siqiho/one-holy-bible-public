@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run validate:public-data
+      - run: npm run validate:public-repository
+      - run: npm run validate:public-release
+      - run: npm test
+      - run: npx tsc --noEmit
+      - run: npx tsc -p tsconfig.node.json --noEmit
+      - run: npm run build
+      - run: npm audit --omit=dev
